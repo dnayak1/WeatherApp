@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="text_view_not_set_label">Current City not yet set</string>
+    <string name="button_set_current_city">Set Current City</string>
+    <string name="editTextCityName" />
+    <string name="edit_text_country_name" />
+    <string name="button_search_city">Search City</string>
+    <string name="text_view_no_city" />
+    <string name="edit_text_alert_current_city_city_name" />
+    <string name="edit_text_alert_current_country_name" />
+    <string name="text_view_current_city_country">Current City Country</string>
+    <string name="text_view_current_weather_text">Weather Text</string>
+    <string name="text_view_current_temperature">Temperature</string>
+    <string name="text_view_current_updated_time">Updated Time</string>
+</resources>
