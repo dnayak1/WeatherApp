@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory android:title="Temperature Unit"></PreferenceCategory>
-<PreferenceCategory android:title="Current City"></PreferenceCategory>
+<Preference
+    android:title="Temperature Unit"
+    android:key="listTemperature"
+    android:summary="Change between Celsius and Fahrenheit">
+</Preference>
+    <Preference
+        android:title="Current City"
+        android:key="listCurrentCity"
+        android:summary="Change Current City">
+    </Preference>
 </PreferenceScreen>

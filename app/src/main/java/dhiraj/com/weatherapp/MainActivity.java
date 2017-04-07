@@ -1,7 +1,9 @@
 package dhiraj.com.weatherapp;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ParseException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -32,8 +34,7 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     Button buttonSetCurrentCity;
     EditText editTextSetCurrentCityName;
     EditText editTextSetCurrentCountryName;
-    String currentCity;
-    String currentCountry;
+    String currentCity,currentCountry,currentTemperature;
     ProgressBar progressBarCurrentCity;
     RelativeLayout linearLayoutCurrent;
     TextView textViewCurrentCityCountry;
@@ -45,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     TextView textViewNoCity;
     String imageUrl;
     Date outputDate;
+    SharedPreferences currentLocationPreferences;
+    public static final int REQ_KEY=100;
+    public static final String VAL_KEY="value";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +67,17 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         imageViewWeather= (ImageView) findViewById(R.id.imageViewCurrentImage);
         progressBarCurrentCity= (ProgressBar) findViewById(R.id.progressBarCurrentCity);
         progressBarCurrentCity.setVisibility(View.INVISIBLE);
+        currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
+        String savedKey=currentLocationPreferences.getString("key","").trim();
+        if(!savedKey.isEmpty()){
+            buttonSetCurrentCity.setVisibility(View.INVISIBLE);
+            textViewNotSetLabel.setVisibility(View.INVISIBLE);
+            linearLayoutCurrent.setVisibility(View.VISIBLE);
+            currentCountry=currentLocationPreferences.getString("country","");
+            currentCity=currentLocationPreferences.getString("city","");
+            currentTemperature=currentLocationPreferences.getString("temperature","");
+            new WeatherAsyncTask(MainActivity.this).execute("http://dataservice.accuweather.com/currentconditions/v1/"+savedKey+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
+        }
         buttonSetCurrentCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,6 +120,12 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         else{
             Toast.makeText(this, "Current City Details Saved", Toast.LENGTH_SHORT).show();
             progressBarCurrentCity.setVisibility(View.VISIBLE);
+            currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor=currentLocationPreferences.edit();
+            editor.putString("city",currentCity);
+            editor.putString("country",currentCountry);
+            editor.putString("key",key);
+            editor.apply();
             new WeatherAsyncTask(MainActivity.this).execute("http://dataservice.accuweather.com/currentconditions/v1/"+key+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
         }
 
@@ -126,7 +147,12 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         }
         String weatherIconUrl="http://developer.accuweather.com/sites/default/files/"+imageUrl+"-s.png";
         Picasso.with(this).load(weatherIconUrl).into(imageViewWeather);
-        textViewTemperature.setText("Temperature: "+weather.getMetricCelsius()+"C");
+        if(currentTemperature!=null && !currentTemperature.isEmpty() && currentTemperature.equalsIgnoreCase("Fahrenheit")){
+            textViewTemperature.setText("Temperature: "+weather.getMetricFahrenheit()+"°F");
+        }
+        else{
+            textViewTemperature.setText("Temperature: "+weather.getMetricCelsius()+"°C");
+        }
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         SimpleDateFormat simpleDateFormatNewFormat=new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         String dateString=weather.getLocalObservationDateTime();
@@ -153,11 +179,27 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.prefSetting:
-//                startActivity(new Intent(MainActivity.this,PrefActivity.class));
+               startActivityForResult(new Intent(MainActivity.this,SettingsActivity.class),REQ_KEY);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
 
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
+        currentCountry=currentLocationPreferences.getString("country","");
+        currentCity=currentLocationPreferences.getString("city","");
+        currentTemperature=currentLocationPreferences.getString("temperature","");
+        getCityKey(currentCity,currentCountry);
+    }
+
+/*    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(this, "Back Pressed", Toast.LENGTH_SHORT).show();
+    }*/
 }
