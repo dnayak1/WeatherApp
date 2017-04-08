@@ -46,9 +46,14 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     TextView textViewNoCity;
     String imageUrl;
     Date outputDate;
+    EditText editTextSearchCity;
+    EditText editTextSearchCountry;
+    Button buttonSearch;
     SharedPreferences currentLocationPreferences;
     public static final int REQ_KEY=100;
     public static final String VAL_KEY="value";
+    public static final String COUNTRY_KEY="value1";
+    public static final String CITY_KEY="value2";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         imageViewWeather= (ImageView) findViewById(R.id.imageViewCurrentImage);
         progressBarCurrentCity= (ProgressBar) findViewById(R.id.progressBarCurrentCity);
         progressBarCurrentCity.setVisibility(View.INVISIBLE);
+        editTextSearchCity= (EditText) findViewById(R.id.editTextCityName);
+        editTextSearchCountry= (EditText) findViewById(R.id.editTextCountryName);
+        buttonSearch= (Button) findViewById(R.id.buttonSearchCity);
         currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
         String savedKey=currentLocationPreferences.getString("key","").trim();
         if(!savedKey.isEmpty()){
@@ -104,6 +112,18 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
                     }
                 });
                 builder.show();
+            }
+        });
+        buttonSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(editTextSearchCity.getText().toString().trim()!=null && !editTextSearchCity.getText().toString().trim().isEmpty()
+                        && editTextSearchCountry.getText().toString().trim()!=null && !editTextSearchCountry.getText().toString().trim().isEmpty()){
+                    Intent intent=new Intent(MainActivity.this,CityWeatherActivity.class);
+                    intent.putExtra(MainActivity.COUNTRY_KEY,editTextSearchCountry.getText().toString().trim());
+                    intent.putExtra(MainActivity.CITY_KEY,editTextSearchCity.getText().toString().trim());
+                    startActivity(intent);
+                }
             }
         });
 
@@ -183,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
@@ -196,10 +215,4 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         currentTemperature=currentLocationPreferences.getString("temperature","");
         getCityKey(currentCity,currentCountry);
     }
-
-/*    @Override
-    protected void onResume() {
-        super.onResume();
-        Toast.makeText(this, "Back Pressed", Toast.LENGTH_SHORT).show();
-    }*/
 }

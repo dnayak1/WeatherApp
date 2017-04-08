@@ -19,4 +19,17 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_view_city_weather_details">details</string>
+    <string name="text_view_city_weather_headline">Headline</string>
+    <string name="text_view_city_weather_forecast_date">Forecast date</string>
+    <string name="text_view_city_weather_temperature">Temperature</string>
+    <string name="text_view_city_weather_condition">Condition</string>
+    <string name="text_view_city_weather_day">Day</string>
+    <string name="text_view_city_weather_night">Night</string>
+    <string name="text_view_city_weather_day_text">Weather Text</string>
+    <string name="text_view_city_weather_night_text">Weather Text</string>
+    <string name="text_view_city_weather_more_details">Click here for more details</string>
+    <string name="text_view_city_weather_extended_forecast">Click here for extended forecast</string>
+    <string name="text_view_recycler">text View</string>
+    <string name="text_view_city_weather_headline_bold">Headline</string>
 </resources>
