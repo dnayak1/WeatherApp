@@ -9,6 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#D3D3D3"
     tools:context="dhiraj.com.weatherapp.MainActivity">
 
     <TextView
@@ -17,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="31dp"
+        android:layout_marginTop="11dp"
         android:id="@+id/textViewNotSetLabel" />
 
     <Button
@@ -26,7 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewNotSetLabel"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
         android:id="@+id/buttonSetCurrentCity" />
 
     <EditText
@@ -38,7 +38,6 @@
         android:layout_below="@+id/editTextCityName"
         android:layout_alignLeft="@+id/editTextCityName"
         android:layout_alignStart="@+id/editTextCityName"
-        android:layout_marginTop="14dp"
         android:id="@+id/editTextCountryName"
         android:hint="Country Name(i.e. US)" />
 
@@ -48,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextCountryName"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="17dp"
+        android:layout_marginTop="5dp"
         android:id="@+id/buttonSearchCity" />
 
     <TextView
@@ -66,7 +65,7 @@
         android:inputType="textPersonName"
         android:text="@string/editTextCityName"
         android:ems="10"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="100dp"
         android:id="@+id/editTextCityName"
         android:hint="City Name(i.e. Charlotte)"
         android:layout_below="@+id/buttonSetCurrentCity"
@@ -84,20 +83,22 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:id="@+id/linearLayoutWeather"
-        android:visibility="invisible"
-        >
+        android:visibility="invisible">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewCurrentCityCountry"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textStyle="normal|bold"
+            android:textColor="#000000"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewCurrentWeatherText"
             android:layout_below="@+id/textViewCurrentCityCountry"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textColor="#000000"/>
 
         <ImageView
             android:layout_width="100dp"
@@ -111,14 +112,32 @@
             android:layout_height="wrap_content"
             android:id="@+id/textViewCurrentTemperature"
             android:layout_below="@id/imageViewCurrentImage"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textColor="#000000"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textViewCurrentUpdatedTime"
             android:layout_below="@id/textViewCurrentTemperature"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textColor="#000000"/>
 </RelativeLayout>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="380dp"
+        android:id="@+id/textViewNoSavedCitiesToDisplay" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="400dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/textViewNoSavedCitiesToDisplay2" />
 
 </RelativeLayout>

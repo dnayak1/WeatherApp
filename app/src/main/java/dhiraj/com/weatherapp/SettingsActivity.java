@@ -21,30 +21,50 @@ import android.widget.Toast;
  * Created by dhira on 07-04-2017.
  */
 
-public class SettingsActivity extends AppCompatActivity {
-
+public class SettingsActivity extends AppCompatActivity implements CurrentCityAsyncTask.IData {
+    static Preference dialogPreference;
+    static Preference currentCityPreference;
+    static CharSequence[] items={"Celsius","Fahrenheit"};
+    static SharedPreferences preferences;
+    static int index = -1;
+    static int selected;
+    static String savedCity;
+    static String savedCountry;
+    static String city,country;
+    static String savedTemperature;
+    static EditText editTextSetCurrentCityName;
+    static EditText editTextSetCurrentCountryName;
+    static String buttonText="Set";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        preferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
         getFragmentManager().beginTransaction().replace(android.R.id.content,new SettingsFragment()).commit();
-
     }
+
+    @Override
+    public void setupData(KeyDetails keyDetails) {
+        if(keyDetails==null)
+            Toast.makeText(this, "City Not Found", Toast.LENGTH_SHORT).show();
+        else{
+            Toast.makeText(this, "Current City Details Saved", Toast.LENGTH_SHORT).show();
+            savedCity=city;
+            savedCountry=country;
+            SharedPreferences.Editor editor=preferences.edit();
+            editor.putString("city", savedCity);
+            editor.putString("country",savedCountry);
+            editor.apply();
+        }
+    }
+
     public static class SettingsFragment extends PreferenceFragment {
-        Preference dialogPreference,currentCityPreference;
-        CharSequence[] items={"Celsius","Fahrenheit"};
-        SharedPreferences preferences;
-        int index = -1;
-        int selected;
-        String savedCity,savedCountry,savedTemperature;
-        EditText editTextSetCurrentCityName;
-        EditText editTextSetCurrentCountryName;
-        String buttonText="Set";
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
-            preferences= this.getActivity().getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
+//            preferences= this.getActivity().getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
             savedCity=preferences.getString("city","");
             savedCountry=preferences.getString("country","");
             savedTemperature=preferences.getString("temperature","");
@@ -115,13 +135,9 @@ public class SettingsActivity extends AppCompatActivity {
                     builder.setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            savedCity=editTextSetCurrentCityName.getText().toString().trim();
-                            savedCountry=editTextSetCurrentCountryName.getText().toString().trim();
-                            SharedPreferences.Editor editor=preferences.edit();
-                            editor.putString("city", savedCity);
-                            editor.putString("country",savedCountry);
-                            editor.apply();
-
+                            city=editTextSetCurrentCityName.getText().toString().trim();
+                            country=editTextSetCurrentCountryName.getText().toString().trim();
+                            new CurrentCityAsyncTask((SettingsActivity)getActivity()).execute("http://dataservice.accuweather.com/locations/v1/"+country+"/search?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh&q="+city);
                         }
                     });
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

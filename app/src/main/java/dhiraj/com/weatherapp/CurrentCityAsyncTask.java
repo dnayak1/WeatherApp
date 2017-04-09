@@ -15,7 +15,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by dhira on 05-04-2017.
  */
 
-public class CurrentCityAsyncTask extends AsyncTask<String, Void, String> {
+public class CurrentCityAsyncTask extends AsyncTask<String, Void, KeyDetails> {
     IData activity;
 
     public CurrentCityAsyncTask(IData activity) {
@@ -23,7 +23,7 @@ public class CurrentCityAsyncTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected KeyDetails doInBackground(String... params) {
         try {
             URL url=new URL(params[0]);
             HttpURLConnection connection= (HttpURLConnection) url.openConnection();
@@ -52,12 +52,12 @@ public class CurrentCityAsyncTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        activity.setupData(s);
+    protected void onPostExecute(KeyDetails keyDetails) {
+        super.onPostExecute(keyDetails);
+        activity.setupData(keyDetails);
     }
 
     static public interface IData{
-        public void setupData(String key);
+        public void setupData(KeyDetails keyDetails);
     }
 }

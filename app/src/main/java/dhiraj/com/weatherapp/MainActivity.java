@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ParseException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     Button buttonSetCurrentCity;
     EditText editTextSetCurrentCityName;
     EditText editTextSetCurrentCountryName;
-    String currentCity,currentCountry,currentTemperature;
+    String currentCity,currentCountry,currentTemperature,currentKey;
     ProgressBar progressBarCurrentCity;
     RelativeLayout linearLayoutCurrent;
     TextView textViewCurrentCityCountry;
@@ -44,7 +46,9 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     ImageView imageViewWeather;
     TextView textViewNotSetLabel;
     TextView textViewNoCity;
-    String imageUrl;
+    TextView textViewNoSavedCities;
+    TextView textViewNoSavedCities2;
+    String imageUrl,savedKey;
     Date outputDate;
     EditText editTextSearchCity;
     EditText editTextSearchCountry;
@@ -58,7 +62,9 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setIcon(R.drawable.ic_launcher);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+        getSupportActionBar().setTitle("  Weather App");
+        getSupportActionBar().setIcon(R.drawable.summer);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         buttonSetCurrentCity= (Button) findViewById(R.id.buttonSetCurrentCity);
@@ -75,8 +81,12 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         editTextSearchCity= (EditText) findViewById(R.id.editTextCityName);
         editTextSearchCountry= (EditText) findViewById(R.id.editTextCountryName);
         buttonSearch= (Button) findViewById(R.id.buttonSearchCity);
+        textViewNoSavedCities= (TextView) findViewById(R.id.textViewNoSavedCitiesToDisplay);
+        textViewNoSavedCities2= (TextView) findViewById(R.id.textViewNoSavedCitiesToDisplay2);
+        textViewNoSavedCities.setText("There are no cities to display.");
+        textViewNoSavedCities2.setText("Search the city from search the box and save.");
         currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
-        String savedKey=currentLocationPreferences.getString("key","").trim();
+        savedKey=currentLocationPreferences.getString("key","").trim();
         if(!savedKey.isEmpty()){
             buttonSetCurrentCity.setVisibility(View.INVISIBLE);
             textViewNotSetLabel.setVisibility(View.INVISIBLE);
@@ -122,7 +132,10 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
                     Intent intent=new Intent(MainActivity.this,CityWeatherActivity.class);
                     intent.putExtra(MainActivity.COUNTRY_KEY,editTextSearchCountry.getText().toString().trim());
                     intent.putExtra(MainActivity.CITY_KEY,editTextSearchCity.getText().toString().trim());
-                    startActivity(intent);
+                    startActivityForResult(intent,REQ_KEY);
+                }
+                else{
+                    Toast.makeText(MainActivity.this, "City Not Found", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -133,20 +146,23 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         new CurrentCityAsyncTask(MainActivity.this).execute("http://dataservice.accuweather.com/locations/v1/"+currentCountry+"/search?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh&q="+currentCity);
     }
 
-    @Override
-    public void setupData(String key) {
-        if(key==null)
+    @Override public void setupData(KeyDetails keyDetails) {
+        if(keyDetails==null)
             Toast.makeText(this, "City Not Found", Toast.LENGTH_SHORT).show();
         else{
-            Toast.makeText(this, "Current City Details Saved", Toast.LENGTH_SHORT).show();
+            currentKey=keyDetails.getKey();
+            currentCountry=keyDetails.getCountry();
+            currentCity=keyDetails.getCity();
+            if(savedKey.isEmpty())
+                Toast.makeText(this, "Current City Details Saved", Toast.LENGTH_SHORT).show();
             progressBarCurrentCity.setVisibility(View.VISIBLE);
             currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor=currentLocationPreferences.edit();
             editor.putString("city",currentCity);
             editor.putString("country",currentCountry);
-            editor.putString("key",key);
+            editor.putString("key",currentKey);
             editor.apply();
-            new WeatherAsyncTask(MainActivity.this).execute("http://dataservice.accuweather.com/currentconditions/v1/"+key+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
+            new WeatherAsyncTask(MainActivity.this).execute("http://dataservice.accuweather.com/currentconditions/v1/"+currentKey+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
         }
 
     }
@@ -199,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.prefSetting:
-               startActivityForResult(new Intent(MainActivity.this,SettingsActivity.class),REQ_KEY);
+                startActivityForResult(new Intent(MainActivity.this,SettingsActivity.class),REQ_KEY);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -212,7 +228,9 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
         currentCountry=currentLocationPreferences.getString("country","");
         currentCity=currentLocationPreferences.getString("city","");
+        savedKey=currentLocationPreferences.getString("key","");
         currentTemperature=currentLocationPreferences.getString("temperature","");
         getCityKey(currentCity,currentCountry);
     }
+
 }

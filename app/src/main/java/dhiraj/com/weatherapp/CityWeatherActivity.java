@@ -10,6 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -38,17 +41,21 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     TextView textViewExtendedForeCast;
     RelativeLayout relativeLayoutCityWeatherContainer;
     ProgressBar progressBarCityWeather;
-    String country, city, dayImageUrl, nightImageUrl, outputDateString;
+    String country, city, dayImageUrl, nightImageUrl, outputDateString, cityKey;
     GridRecyclerAdapter gridRecyclerAdapter;
     LinearLayoutManager layoutManager;
     Date inputDate;
+    SharedPreferences currentLocationPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_weather);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
-        getSupportActionBar().setTitle("Weather App");
+        getSupportActionBar().setTitle("  Weather App");
+        getSupportActionBar().setIcon(R.drawable.summer);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         textViewCityCountryDetails= (TextView) findViewById(R.id.textViewCityWeatherDetails);
         textViewHeadline= (TextView) findViewById(R.id.textViewCityWeatherHeadline);
         textViewForecastDate= (TextView) findViewById(R.id.textViewCityWeatherForecastDate);
@@ -64,7 +71,6 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
         relativeLayoutCityWeatherContainer= (RelativeLayout) findViewById(R.id.cityWeatherContainer);
         country=getIntent().getStringExtra(MainActivity.COUNTRY_KEY);
         city=getIntent().getStringExtra(MainActivity.CITY_KEY);
-        country=getIntent().getStringExtra(MainActivity.COUNTRY_KEY);
         progressBarCityWeather.setVisibility(View.VISIBLE);
         relativeLayoutCityWeatherContainer.setVisibility(View.INVISIBLE);
         new CurrentCityAsyncTask(this).execute("http://dataservice.accuweather.com/locations/v1/"+country+"/search?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh&q="+city);
@@ -72,11 +78,14 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     }
 
     @Override
-    public void setupData(String key) {
-        if(key==null)
+    public void setupData(KeyDetails keyDetails) {
+        if(keyDetails==null)
             Toast.makeText(this, "City Not Found", Toast.LENGTH_SHORT).show();
         else{
-            new CityWeatherDetailsAsyncTask(this).execute("http://dataservice.accuweather.com/forecasts/v1/daily/5day/"+key+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
+            cityKey=keyDetails.getKey();
+            country=keyDetails.getCountry();
+            city=keyDetails.getCity();
+            new CityWeatherDetailsAsyncTask(this).execute("http://dataservice.accuweather.com/forecasts/v1/daily/5day/"+keyDetails.getKey()+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
         }
     }
 
@@ -145,5 +154,57 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     @Override
     public void showWeatherDetail(CityWeatherDetails cityWeatherDetails) {
         setSelectedData(cityWeatherDetails);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.city_weather_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.saveCityMenuItem:
+
+                return true;
+            case R.id.setAsCurrentCityMenuItem:
+                currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
+                String savedKey=currentLocationPreferences.getString("key","").trim();
+                if(!savedKey.isEmpty()){
+                    SharedPreferences.Editor editor=currentLocationPreferences.edit();
+                    editor.putString("city",city);
+                    editor.putString("country",country);
+                    editor.putString("key",cityKey);
+                    editor.apply();
+                    Toast.makeText(this, "Current City Updated", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                else{
+                    SharedPreferences.Editor editor=currentLocationPreferences.edit();
+                    editor.putString("city",city);
+                    editor.putString("country",country);
+                    editor.putString("key",cityKey);
+                    editor.apply();
+                    Toast.makeText(this, "Current City Saved", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            case R.id.settingsMenuItem:
+                startActivityForResult(new Intent(CityWeatherActivity.this,SettingsActivity.class),MainActivity.REQ_KEY);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(MainActivity.RESULT_OK);
+    }
+
+    public void saveData(){
+
     }
 }
