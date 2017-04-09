@@ -20,6 +20,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -27,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class CityWeatherActivity extends AppCompatActivity implements CurrentCityAsyncTask.IData,CityWeatherDetailsAsyncTask.ICityWeatherDetailsData,GridRecyclerAdapter.IGridListener {
+public class CityWeatherActivity extends AppCompatActivity implements CurrentCityAsyncTask.IData,CityWeatherDetailsAsyncTask.ICityWeatherDetailsData,GridRecyclerAdapter.IGridListener,WeatherAsyncTask.IWeatherData {
     TextView textViewCityCountryDetails;
     TextView textViewHeadline;
     TextView textViewForecastDate;
@@ -45,6 +51,7 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     GridRecyclerAdapter gridRecyclerAdapter;
     LinearLayoutManager layoutManager;
     Date inputDate;
+    String currentTemperature,storeTemperature;
     SharedPreferences currentLocationPreferences;
 
     @Override
@@ -167,7 +174,7 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.saveCityMenuItem:
-
+                saveData();
                 return true;
             case R.id.setAsCurrentCityMenuItem:
                 currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
@@ -205,6 +212,59 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     }
 
     public void saveData(){
+        new WeatherAsyncTask(CityWeatherActivity.this).execute("http://dataservice.accuweather.com/currentconditions/v1/"+cityKey+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
+
+
+    }
+
+    @Override
+    public void setupWeatherData(Weather weather) {
+        currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
+        currentTemperature=currentLocationPreferences.getString("temperature","");
+        if(currentTemperature!=null && !currentTemperature.isEmpty() && currentTemperature.equalsIgnoreCase("Fahrenheit")){
+            storeTemperature=weather.getMetricFahrenheit()+"°F";
+        }
+        else{
+            storeTemperature=weather.getMetricCelsius()+"°C";
+        }
+        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("cities").child(cityKey);
+        DatabaseReference cityDatabaseReference= FirebaseDatabase.getInstance().getReference("cities");
+        String cityId= databaseReference.getKey();
+        CityData cityData=new CityData();
+        cityData.setKeyCity(cityKey);
+        cityData.setCountry(country);
+        cityData.setCityName(city);
+        cityData.setTemperature(storeTemperature);
+        cityData.setCityId(cityId);
+        databaseReference.setValue(cityData);
+
+
+        cityDatabaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Toast.makeText(CityWeatherActivity.this, "City Saved", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                Toast.makeText(CityWeatherActivity.this, "City Updated", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 }
