@@ -245,6 +245,7 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 //Toast.makeText(CityWeatherActivity.this, "City Saved", Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
