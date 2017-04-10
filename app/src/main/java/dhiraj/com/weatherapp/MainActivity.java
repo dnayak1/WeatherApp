@@ -299,7 +299,8 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         savedKey=currentLocationPreferences.getString("key","");
         currentTemperature=currentLocationPreferences.getString("temperature","");
         savedKey="1";
-        getCityKey(currentCity,currentCountry);
+        if(currentCountry!=null && !currentCountry.isEmpty() && currentCity!=null && !currentCity.isEmpty())
+            getCityKey(currentCity,currentCountry);
 
     }
 
