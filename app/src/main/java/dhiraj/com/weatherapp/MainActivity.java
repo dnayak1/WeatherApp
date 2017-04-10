@@ -168,12 +168,23 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
                 textViewNoSavedCities.setVisibility(View.INVISIBLE);
                 textViewNoSavedCities2.setVisibility(View.INVISIBLE);
                 cityDataArrayList.add(dataSnapshot.getValue(CityData.class));
+                cityDataArrayList=sortByFavorites();
+                listRecyclerAdapter=new ListRecyclerAdapter(MainActivity.this,cityDataArrayList,MainActivity.this);
+                recyclerViewSavedCities.setAdapter(listRecyclerAdapter);
+                layoutManager = new LinearLayoutManager(MainActivity.this );
+                recyclerViewSavedCities.setLayoutManager(layoutManager);
                 listRecyclerAdapter.notifyDataSetChanged();
-            }
 
+            }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                cityDataArrayList=sortByFavorites();
+                listRecyclerAdapter=new ListRecyclerAdapter(MainActivity.this,cityDataArrayList,MainActivity.this);
+                recyclerViewSavedCities.setAdapter(listRecyclerAdapter);
+                layoutManager = new LinearLayoutManager(MainActivity.this );
+                recyclerViewSavedCities.setLayoutManager(layoutManager);
                 listRecyclerAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -287,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         currentCity=currentLocationPreferences.getString("city","");
         savedKey=currentLocationPreferences.getString("key","");
         currentTemperature=currentLocationPreferences.getString("temperature","");
+        savedKey="1";
         getCityKey(currentCity,currentCountry);
 
     }
@@ -311,6 +323,27 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         cityData.setFavorite(false);
         cityDatabaseReference.child(cityData.getKeyCity()).setValue(cityData);
         Toast.makeText(this, "Removed from Favorites", Toast.LENGTH_SHORT).show();
+    }
+
+    private ArrayList<CityData> sortByFavorites()
+    {
+        ArrayList<CityData> temp = new ArrayList<>();
+
+        for(CityData n:cityDataArrayList)
+        {
+            if(n.getFavorite())
+            {
+                temp.add(n);
+            }
+        }
+        for(CityData n:cityDataArrayList)
+        {
+            if(!n.getFavorite())
+            {
+                temp.add(n);
+            }
+        }
+        return temp;
     }
 
 }

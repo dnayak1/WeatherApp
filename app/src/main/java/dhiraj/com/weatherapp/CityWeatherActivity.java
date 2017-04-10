@@ -53,7 +53,6 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     Date inputDate;
     String currentTemperature,storeTemperature,updatedTime;
     SharedPreferences currentLocationPreferences;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -216,7 +215,6 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     public void saveData(){
         new WeatherAsyncTask(CityWeatherActivity.this).execute("http://dataservice.accuweather.com/currentconditions/v1/"+cityKey+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
 
-
     }
 
     @Override
@@ -243,17 +241,16 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
         cityData.setFavorite(false);
         databaseReference.setValue(cityData);
 
-
         cityDatabaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(CityWeatherActivity.this, "City Saved", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(CityWeatherActivity.this, "City Saved", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                Toast.makeText(CityWeatherActivity.this, "City Updated", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(CityWeatherActivity.this, "City Updated", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -272,4 +269,5 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
         });
 
     }
+
 }

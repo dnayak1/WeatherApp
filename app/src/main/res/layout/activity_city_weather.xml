@@ -78,59 +78,65 @@
             android:layout_marginTop="120dp"
             android:id="@+id/textViewCityWeatherCondition"
             android:textStyle="bold"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="140dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+                <TextView
+                    android:text="@string/text_view_city_weather_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textViewCityWeatherDay" />
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/imageViewCityWeatherDay"
+                    android:layout_below="@+id/textViewCityWeatherDay" />
+                <TextView
+                    android:text="@string/text_view_city_weather_day_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textViewCityWeatherDayText"
+                    android:layout_below="@+id/imageViewCityWeatherDay"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center">
+                <TextView
+                    android:text="@string/text_view_city_weather_night"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textViewCityWeatherNight"/>
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/imageViewCityWeatherNight"
+                    android:layout_below="@+id/textViewCityWeatherNight" />
+                <TextView
+                    android:text="@string/text_view_city_weather_night_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textViewCityWeatherNightText"
+                    android:layout_below="@+id/imageViewCityWeatherNight" />
+            </LinearLayout>
 
-        <TextView
-            android:text="@string/text_view_city_weather_day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textViewCityWeatherDay"
-            android:layout_marginTop="125dp"
-            android:layout_marginLeft="50dp"/>
-
-        <TextView
-            android:text="@string/text_view_city_weather_night"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="250dp"
-            android:layout_marginTop="125dp"
-            android:id="@+id/textViewCityWeatherNight"/>
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/imageViewCityWeatherDay"
-            android:layout_below="@+id/textViewCityWeatherDay"
-            android:layout_marginLeft="15dp" />
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/imageViewCityWeatherNight"
-            android:layout_below="@+id/textViewCityWeatherNight"
-            android:layout_marginLeft="220dp"/>
-
-        <TextView
-            android:text="@string/text_view_city_weather_day_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textViewCityWeatherDayText"
-            android:layout_below="@+id/imageViewCityWeatherDay"
-            android:layout_marginLeft="20dp"/>
-
-        <TextView
-            android:text="@string/text_view_city_weather_night_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textViewCityWeatherNightText"
-            android:layout_below="@+id/imageViewCityWeatherNight"
-            android:paddingRight="40dp"
-            android:layout_alignParentRight="true"/>
+        </LinearLayout>
 
         <TextView
             android:text="@string/text_view_city_weather_more_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="270dp"
+            android:layout_marginTop="280dp"
             android:layout_centerHorizontal="true"
             android:id="@+id/textViewCityWeatherMoreDetails"
             android:textColor="#0011FF"/>
@@ -138,7 +144,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="125dp"
-            android:layout_marginTop="300dp"
+            android:layout_marginTop="310dp"
             android:orientation="vertical">
 
             <android.support.v7.widget.RecyclerView
@@ -156,7 +162,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/textViewCityWeatherExtendedForecast"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="420dp"
+            android:layout_marginTop="430dp"
             android:textColor="#0011FF"/>
 
     </RelativeLayout>

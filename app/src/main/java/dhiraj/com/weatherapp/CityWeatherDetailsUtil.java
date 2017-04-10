@@ -36,7 +36,7 @@ public class CityWeatherDetailsUtil {
                 cityWeatherDetails.setNightImage(jsonObjectNight.getString("Icon"));
                 cityWeatherDetails.setNightText(jsonObjectNight.getString("IconPhrase"));
                 cityWeatherDetails.setMoreDetails(jsonObjectCityWeatherDetail.getString("MobileLink"));
-                cityWeatherDetails.setExtendedForeCast(jsonObjectCityWeatherDetail.getString("Link"));
+                cityWeatherDetails.setExtendedForeCast(root.getString("MobileLink"));
                 cityWeatherDetailsArrayList.add(cityWeatherDetails);
             }
             return cityWeatherDetailsArrayList;

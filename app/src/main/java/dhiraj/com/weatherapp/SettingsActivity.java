@@ -27,7 +27,7 @@ public class SettingsActivity extends AppCompatActivity implements CurrentCityAs
     static CharSequence[] items={"Celsius","Fahrenheit"};
     static SharedPreferences preferences;
     static int index = -1;
-    static int selected;
+    static int selected=-1;
     static String savedCity;
     static String savedCountry;
     static String city,country;
@@ -102,7 +102,7 @@ public class SettingsActivity extends AppCompatActivity implements CurrentCityAs
                                        if(index==1 && selected==0){
                                            Toast.makeText(getActivity(), "Temperature Unit has been changed from °F to °C", Toast.LENGTH_SHORT).show();
                                        }
-                                       else{
+                                       else if(index==0 && selected==1){
                                            Toast.makeText(getActivity(), "Temperature Unit has been changed from °C to °F", Toast.LENGTH_SHORT).show();
                                        }
                                        index=selected;
