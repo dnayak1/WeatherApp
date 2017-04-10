@@ -140,4 +140,11 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/textViewNoSavedCitiesToDisplay2" />
 
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@+id/textViewNoCity"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/recyclerViewSavedCities" />
+
 </RelativeLayout>

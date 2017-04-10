@@ -10,6 +10,8 @@ import android.net.ParseException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,15 +26,22 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import org.ocpsoft.prettytime.PrettyTime;
 import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity implements CurrentCityAsyncTask.IData,WeatherAsyncTask.IWeatherData {
+public class MainActivity extends AppCompatActivity implements CurrentCityAsyncTask.IData,WeatherAsyncTask.IWeatherData,ListRecyclerAdapter.IListListener {
     Button buttonSetCurrentCity;
     EditText editTextSetCurrentCityName;
     EditText editTextSetCurrentCountryName;
@@ -53,15 +62,21 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
     EditText editTextSearchCity;
     EditText editTextSearchCountry;
     Button buttonSearch;
+    RecyclerView recyclerViewSavedCities;
+    ListRecyclerAdapter listRecyclerAdapter;
+    LinearLayoutManager layoutManager;
     SharedPreferences currentLocationPreferences;
     public static final int REQ_KEY=100;
     public static final String VAL_KEY="value";
     public static final String COUNTRY_KEY="value1";
     public static final String CITY_KEY="value2";
+    ArrayList<CityData> cityDataArrayList;
+    DatabaseReference cityDatabaseReference= FirebaseDatabase.getInstance().getReference("cities");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        cityDataArrayList=new ArrayList<>();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
         getSupportActionBar().setTitle("  Weather App");
         getSupportActionBar().setIcon(R.drawable.summer);
@@ -85,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         textViewNoSavedCities2= (TextView) findViewById(R.id.textViewNoSavedCitiesToDisplay2);
         textViewNoSavedCities.setText("There are no cities to display.");
         textViewNoSavedCities2.setText("Search the city from search the box and save.");
+        recyclerViewSavedCities= (RecyclerView) findViewById(R.id.recyclerViewSavedCities);
         currentLocationPreferences=getSharedPreferences("locationPreferences", Context.MODE_PRIVATE);
         savedKey=currentLocationPreferences.getString("key","").trim();
         if(!savedKey.isEmpty()){
@@ -96,6 +112,11 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
             currentTemperature=currentLocationPreferences.getString("temperature","");
             new WeatherAsyncTask(MainActivity.this).execute("http://dataservice.accuweather.com/currentconditions/v1/"+savedKey+"?apikey=GGGvhnax8EYhgq1ICf6Qo5x2bMLjTBGh");
         }
+        listRecyclerAdapter=new ListRecyclerAdapter(MainActivity.this,cityDataArrayList,MainActivity.this);
+        recyclerViewSavedCities.setAdapter(listRecyclerAdapter);
+        layoutManager = new LinearLayoutManager(MainActivity.this );
+        recyclerViewSavedCities.setLayoutManager(layoutManager);
+        listRecyclerAdapter.notifyDataSetChanged();
         buttonSetCurrentCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,6 +158,41 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
                 else{
                     Toast.makeText(MainActivity.this, "City Not Found", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+
+        cityDatabaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                textViewNoSavedCities.setVisibility(View.INVISIBLE);
+                textViewNoSavedCities2.setVisibility(View.INVISIBLE);
+                cityDataArrayList.add(dataSnapshot.getValue(CityData.class));
+                listRecyclerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                listRecyclerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                listRecyclerAdapter.notifyDataSetChanged();
+                if(cityDataArrayList.size()==0){
+                    textViewNoSavedCities.setVisibility(View.VISIBLE);
+                    textViewNoSavedCities2.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 
@@ -202,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         PrettyTime prettyTime=new PrettyTime();
         String stringPrettyTime=prettyTime.format(outputDate);
         textViewUpdatedTime.setText("Updated "+stringPrettyTime);
+
     }
 
     @Override
@@ -231,6 +288,29 @@ public class MainActivity extends AppCompatActivity implements CurrentCityAsyncT
         savedKey=currentLocationPreferences.getString("key","");
         currentTemperature=currentLocationPreferences.getString("temperature","");
         getCityKey(currentCity,currentCountry);
+
+    }
+
+    @Override
+    public void deleteWeather(CityData cityData) {
+        cityDataArrayList.remove(cityData);
+        cityDatabaseReference.child(cityData.getKeyCity()).getRef().removeValue();
+        Toast.makeText(this, "City Deleted", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void makeFavorite(CityData cityData) {
+        cityData.setFavorite(true);
+        cityDatabaseReference.child(cityData.getKeyCity()).setValue(cityData);
+        Toast.makeText(this, "Added to Favorites", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void removeFavorite(CityData cityData) {
+        cityData.setFavorite(false);
+        cityDatabaseReference.child(cityData.getKeyCity()).setValue(cityData);
+        Toast.makeText(this, "Removed from Favorites", Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -7,8 +7,16 @@ import java.io.Serializable;
  */
 
 public class CityData implements Serializable {
-    String  keyCity,cityName,country,temperature,cityId;
+    String  keyCity,cityName,country,temperature,cityId,updatedTime;
     Boolean favorite;
+
+    public String getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(String updatedTime) {
+        this.updatedTime = updatedTime;
+    }
 
     public String getCityId() {
         return cityId;

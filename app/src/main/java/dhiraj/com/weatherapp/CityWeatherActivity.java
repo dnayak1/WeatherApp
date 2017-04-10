@@ -51,7 +51,7 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
     GridRecyclerAdapter gridRecyclerAdapter;
     LinearLayoutManager layoutManager;
     Date inputDate;
-    String currentTemperature,storeTemperature;
+    String currentTemperature,storeTemperature,updatedTime;
     SharedPreferences currentLocationPreferences;
 
     @Override
@@ -86,8 +86,10 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
 
     @Override
     public void setupData(KeyDetails keyDetails) {
-        if(keyDetails==null)
+        if(keyDetails==null){
             Toast.makeText(this, "City Not Found", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         else{
             cityKey=keyDetails.getKey();
             country=keyDetails.getCountry();
@@ -227,6 +229,7 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
         else{
             storeTemperature=weather.getMetricCelsius()+"°C";
         }
+        updatedTime=weather.getLocalObservationDateTime();
         DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("cities").child(cityKey);
         DatabaseReference cityDatabaseReference= FirebaseDatabase.getInstance().getReference("cities");
         String cityId= databaseReference.getKey();
@@ -235,7 +238,9 @@ public class CityWeatherActivity extends AppCompatActivity implements CurrentCit
         cityData.setCountry(country);
         cityData.setCityName(city);
         cityData.setTemperature(storeTemperature);
+        cityData.setUpdatedTime(updatedTime);
         cityData.setCityId(cityId);
+        cityData.setFavorite(false);
         databaseReference.setValue(cityData);
 
 
